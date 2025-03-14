@@ -19,15 +19,15 @@ router.get('/', handleErrorAsync(async(req, res, next)=>{
             start_at:true, 
             end_at:true, 
             max_participants:true,
-            // User:{
-            //     name:true
-            // },
+            User:{
+                name:true
+            },
             Skill:{
                 name:true
             }
         },
         relations: {
-            // User,
+            User,
             Skill
         }
     })
