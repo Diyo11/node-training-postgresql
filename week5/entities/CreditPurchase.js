@@ -40,7 +40,7 @@ module.exports = new EntitySchema({
             nullable: false
         }
     },
-    relations:{
+    /*relations:{
         User:{
             target: 'User',
             type: 'many-to-one',
@@ -60,4 +60,25 @@ module.exports = new EntitySchema({
             }
         }
     }
+})*/
+relations: {
+    User: {
+      target: 'User',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'user_id',
+        referencedColumnName: 'id',
+        foreignKeyConstraintName: 'credit_purchase_user_id_fk'
+      }
+    },
+    CreditPackage: {
+      target: 'CreditPackage',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'credit_package_id',
+        referencedColumnName: 'id',
+        foreignKeyConstraintName: 'credit_purchase_credit_package_id_fk'
+      }
+    }
+  }
 })

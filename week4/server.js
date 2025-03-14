@@ -226,7 +226,7 @@ const requestListener = async (req, res) => {
           }
         })
         if(existPackage.length > 0){
-          res.writeHead(409, headers({
+          res.write(409, headers({
             status:"failed",
             message:"資料重複"
           }))
@@ -253,7 +253,7 @@ const requestListener = async (req, res) => {
         res.end();
       }
     })
-  }else if(req.url.startsWith(/api/coaches/skill) && req.method === "DELETE"){
+  }else if(req.url.startsWith('/api/coaches/skill') && req.method === "DELETE"){
     try{
       const packageId = req.url.split('/').pop();
       if(undefined(packageId) ||isNotValidsting(packageId)){

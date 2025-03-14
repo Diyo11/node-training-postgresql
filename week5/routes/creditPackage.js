@@ -101,6 +101,7 @@ router.delete('/:creditPackageId', async (req, res, next) => {
 })
 
 // TODO week6 LV2
+/*
 router.post('/:creditPackageId', isAuth, handleErrorAsync(async(req, res, next)=>{
     const { id } = req.user;
     const { creditPackageId } = req.params;
@@ -127,6 +128,6 @@ router.post('/:creditPackageId', isAuth, handleErrorAsync(async(req, res, next)=
     res.status(200).json({
         status: 'success'
     })
-}))
+}))*/
 
 module.exports = router

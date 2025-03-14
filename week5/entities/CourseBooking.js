@@ -61,14 +61,23 @@ module.exports = new EntitySchema({
                 foreignKeyConstraintName: 'course_booking_user_id_fk'
             }
         },
-        CreditPackage:{
-            target: 'Couse',
+        // CreditPackage:{
+        //     target: 'Course',
+        //     type: 'many-to-one',
+        //     joinColumn:{
+        //         name: 'course_id',
+        //         referencedColumnName: 'id',
+        //         foreignKeyConstraintName: 'course_booking_course_id_fk'
+        //     }
+        // }
+        CreditPackage: {
+            target: 'Course',
             type: 'many-to-one',
-            joinColumn:{
-                name: 'course_id',
-                referencedColumnName: 'id',
-                foreignKeyConstraintName: 'course_booking_course_id_fk'
+            joinColumn: {
+              name: 'course_id',
+              referencedColumnName: 'id',
+              foreignKeyConstraintName: 'course_booking_course_id_fk'
             }
-        }
+          }
     }
 })
