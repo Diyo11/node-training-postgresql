@@ -4,6 +4,9 @@ const router = express.Router()
 const { dataSource } = require('../db/data-source')
 const logger = require('../utils/logger')('CreditPackage')
 const { isUndefined, isNumber, isValidString } = require('../utils/validUtils')     //引入驗證機制
+const handleErrorAsync = require('../utils/handleErrorAsync')
+const isAuth = require('../middlewares/isAuth')
+const appError = require('../utils/appError')
 
 router.get('/', async (req, res, next) => {
     try{
@@ -96,5 +99,34 @@ router.delete('/:creditPackageId', async (req, res, next) => {
         next(error);
     }
 })
+
+// TODO week6 LV2
+router.post('/:creditPackageId', isAuth, handleErrorAsync(async(req, res, next)=>{
+    const { id } = req.user;
+    const { creditPackageId } = req.params;
+    const creaditPackageRepo = dataSource.getRepository('CreditPackage');
+    const creaditPackage = await creaditPackageRepo.findOne({
+        where:{
+            id: creditPackageId
+        }
+    })
+    if(!creaditPackage){
+        next(appError(400, 'ID錯誤'));
+        return;
+    }
+
+    const creditPurchaseRepo = dataSource.getRepository('CreditPurchase');
+    const newPurchase = await creditPurchaseRepo.create({
+        user_id: id,
+        credit_package_id: creditPackageId,
+        purchased_credits: creditPackageId.credit_amount,
+        price_paid: creditPackageId.price,
+        purchaseAt: new Date().toISOString()
+    })
+    await creditPurchaseRepo.save(newPurchase)
+    res.status(200).json({
+        status: 'success'
+    })
+}))
 
 module.exports = router

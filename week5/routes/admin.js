@@ -4,8 +4,10 @@ const router = express.Router();
 const { dataSource } = require('../db/data-source');
 const logger = require('../utils/logger');
 const { isUndefined, isNumber, isValidString } = require('../utils/validUtils');
+const isAuth = require('../middlewares/isAuth');
+const isCoach = require('../middlewares/isCoach');
 
-router.post('/coaches/courses', async(req, res, next) =>{
+router.post('/coaches/courses', isAuth, isCoach, async(req, res, next) =>{
     try{
         const {user_id, skill_id, name, description, start_at, end_at, max_participants, meeting_url} = req.body;
         if(!isValidString(user_id) || !isValidString(skill_id) || !isValidString(name)
@@ -62,7 +64,7 @@ router.post('/coaches/courses', async(req, res, next) =>{
     }
 })
 
-router.put('/coaches/courses/:courseId', async(req, res, next) =>{
+router.put('/coaches/courses/:courseId', isAuth, isCoach,async(req, res, next) =>{
     try{
             const { courseId } = req.params;
             const {user_id, skill_id, name, description, start_at, end_at, max_participants, meeting_url} = req.body;

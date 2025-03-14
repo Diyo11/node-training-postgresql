@@ -9,6 +9,7 @@ const skillRouter = require('./routes/skill')
 const userRouter = require('./routes/users')
 const adminRouter = require('./routes/admin')
 const coachesRouter = require('./routes/coach')
+const coursesRouter = require('./routes/courses')
 
 const app = express()
 app.use(cors())
@@ -34,6 +35,7 @@ app.use('/api/coaches/skill', skillRouter)
 app.use('/api/users', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/coaches', coachesRouter);
+app.use('/api/courses', coursesRouter)
 
 //404，上面api都不對就會執行到錯誤
 app.use((req, res, next) =>{

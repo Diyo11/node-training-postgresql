@@ -8,11 +8,15 @@ const { password } = require('../config/db');
 
 const bcrypt = require('bcrypt');
 const { generateJWT } = require('../utils/jwtUtils');
+const appError = require('../utils/appError');
 const saltRounds = 10;
+
+const isAuth = require('../middlewares/isAuth');
+const handleErrorAsync = require('../utils/handleErrorAsync');
 
 const isValidPassword = (value) =>{                                     //檢查密碼
     const passwordPattern = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}/     //正規表達式檢驗是否符合
-    console.log(passwordPattern.test(value));
+    // console.log(passwordPattern.test(value));
     return passwordPattern.test(value);
 }
 
@@ -51,7 +55,7 @@ router.post('/signup', async(req, res, next) =>{
         return;
     }
 
-    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const hashPassword = await bcrypt.hash(data.password, saltRounds);
     const newUser = userRepo.create({
         name: data.name,
         password: hashPassword,
@@ -99,22 +103,22 @@ router.post('/login',async(req, res, next) =>{
             }
         })
         if(!findUser){
-            next(400, '使用者不存在');
+            next(appError(400, '使用者不存在'));
             return;
         }
         const isMatch = await bcrypt.compare(password, findUser.password);
         if(!isMatch){
-            next(400, '密碼錯誤');
+            next(appError(400, '密碼錯誤'));
             return;
         }
     
-        // TODO JWT
+        // JWT
         const token = generateJWT({
             id: findUser.id,
             role: findUser.role
         })
 
-        res.status(200).json({
+        res.status(201).json({
             status:'success',
             data: {
                 token,
@@ -124,6 +128,66 @@ router.post('/login',async(req, res, next) =>{
             }
         })
     }catch(error){
+        next(error);
+    }
+})
+
+router.get('/profile', isAuth, handleErrorAsync(async(req, res, next)=>{    //handleErrorAsync 共同處理try-catch錯誤
+    const { id } = req.user;
+    if(!isValidString(id)){
+        return next(appError(400, "欄位未填寫正確"));
+        // return;
+    }
+    const findUser = await dataSource.getRepository('User').findOne({
+        where:{
+            id
+        }
+    })
+    res.status(200).json({
+        status: 'success',
+        data:{
+            email: findUser.email,
+            name: findUser.name
+        }
+    })
+}))
+
+router.put('/profile', isAuth, async(req, res, next)=>{
+    try{
+        const { id } = req.user;
+        const { name } = req.body;
+        if(!isValidString(name) || isUndefined(name) ||
+            !/^[\u4e00-\u9fa5a-zA-Z0-9]{2,10}$/.test(name)){
+            next(appError(400, '欄位未填寫正確'));
+            return;
+        }
+
+        const userRepo = dataSource.getRepository('User');
+        //檢查使用者名稱未變更
+        const findUser = await userRepo.findOne({
+            where:{ id }
+        })
+        if(findUser.name === name){
+            next(appError(400, '使用者名稱未變更'));
+            return;
+        }
+        //更新
+        const updateUser = userRepo.update({
+            //條件
+            id
+        },{
+            //更新欄位
+            name
+        })
+        if(updateUser.affected === 0){
+            next(appError(400, '更新使用者失敗'));
+        }
+
+        res.status(200).json({
+            status: 'success'
+        })
+    }catch(error){
+        logger.error('取得使用者資料錯誤:', error)
         next(error);
     }
 })
