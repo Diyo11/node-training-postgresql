@@ -7,7 +7,7 @@ const coachesController = {
     ////[GET] 取得教練列表
     async get_coachList(req, res, next){
         const{ per, page } = req.query;
-        if(!isValidString(per) || isValidString(page)){
+        if(!isValidString(per) || !isValidString(page)){
             res.status(400).json({
                 status: "failed",
                 message: "欄位未填寫正確"

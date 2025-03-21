@@ -39,15 +39,15 @@ module.exports = new EntitySchema({
             updateDate :true
         }
     },
-    relation:{          // Coach關聯表
-        user:{
+    relations:{          // Coach關聯表
+        User:{
             target: 'User',
             type: 'one-to-one',
             inverseSide: 'Coach',
             joinColumn:{                                       //關聯表裡的哪些欄位
                 name: 'user_id',                                //***?? */
                 referencedColumnName: 'id',
-                foreignKeyConstraintName: 'coach_user_id_fk'
+                foreignKeyConstraintName: 'user_coach_id_fk'
             }
         }
     }
